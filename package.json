@@ -1,0 +1,23 @@
+{
+  "name": "10_employee-tracker",
+  "version": "1.0.0",
+  "description": "",
+  "main": "orm.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ElwinUng0120/Employee-Tracker.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ElwinUng0120/Employee-Tracker/issues"
+  },
+  "homepage": "https://github.com/ElwinUng0120/Employee-Tracker#readme",
+  "dependencies": {
+    "inquirer": "^7.3.3"
+  }
+}
