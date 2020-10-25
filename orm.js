@@ -92,17 +92,32 @@ function deleteEmployee(id){
         `DELETE FROM employee WHERE id=?`, [id]);
 }
 
-function getDepartment(id){
-    return db.query(`SELECT * FROM department` + (id ? `WHERE id=${id}` : ""));
+function getAllDepartments(){
+    return db.query(`SELECT * FROM department`);
 }
 
-function getRole(id){
-    return db.query(`SELECT * FROM role` + (id ? `WHERE id=${id}` : ""));
+function getAllRoles(id){
+    return db.query("SELECT * FROM `role` WHERE `role`.department_id=?", [id]);
 }
 
-function getEmployee(id){
-    return db.query(`SELECT * FROM employee` + (id ? `WHERE id=${id}` : ""));
+function getEmployee(id){ 
+    // default: return all employees
+    // if an id is provided: return specific employee
+    return db.query(
+        "SELECT e.id, e.first_name, e.last_name, r.title, d.`name` AS department, r.salary, CONCAT(m.first_name, ' ', m.last_name) AS manager " + 
+        "FROM (employee AS e, `role` AS r, department AS d) " +
+        "LEFT JOIN employee AS m ON e.manager_id=m.id " +
+        "WHERE e.role_id=r.id AND r.department_id=d.id " +
+        (id ? `AND e.id=${id}` : ""));
+}
+
+function getManager(id){
+    return db.query(
+        "SELECT CONCAT(e.first_name, ' ', e.last_name) AS manager " + 
+        "FROM employee AS e " +
+        "LEFT JOIN `role` AS r ON e.role_id=r.id "+
+        "WHERE r.title LIKE '%Manager%' AND r.department_id=?", [id]);
 }
 
 module.exports = { addDepartment, addEmployee, addRole, editDepartment, editEmployee, editRole, deleteDepartment, 
-                   deleteEmployee, deleteRole, getDepartment, getRole, getEmployee };
+                   deleteEmployee, deleteRole, getAllDepartments, getAllRoles, getEmployee, getManager };
