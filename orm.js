@@ -116,9 +116,8 @@ function getEmployee(id, order){
 function getManager(id){
     return db.query(
         "SELECT CONCAT(e.first_name, ' ', e.last_name) AS manager " + 
-        "FROM employee AS e " +
-        "LEFT JOIN `role` AS r ON e.role_id=r.id "+
-        "WHERE r.title LIKE '%Manager%' " + (id ? `AND r.department_id=${id}` : ""));
+        "FROM employee AS e, `role` AS r "+
+        "WHERE e.role_id=r.id AND r.title LIKE '%Manager%' " + (id ? `AND r.department_id=${id}` : ""));
 }
 
 module.exports = { addDepartment, addEmployee, addRole, editDepartment, editEmployee, editRole, deleteDepartment, 
