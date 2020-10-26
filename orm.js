@@ -54,26 +54,28 @@ function addEmployee(firstName, lastName, rold_id, manager_id){
 
 function editDepartment(name, id){
     return db.query(
-        "UPDATE department SET `name`=? WHERE id=?",
+        "UPDATE department SET `name`='?' WHERE id=?",
         [name, id]
     );
 }
 
-function editRole(){
+function editRole(title, salary, id){
+    if(title === "" && isNaN(salary)) return console.log("No changes were made"); // error catching if both title and salary were left blank
     return db.query(
-        "UPDATE role SET `name`=? WHERE id=?",
-        [name, id]
+        "UPDATE role SET " +
+        (title ? `title="${title}" ` : "") + (salary ? `salary=${salary} ` : "") +
+        `WHERE id=${id}`
     );
 }
 
-function editEmployee(id, firstName="", lastName="", roleID="", managerID=""){
-    const first_name = (firstName == "" ? "" : `first_name=${firstName}`);
-    const last_name = (lastName == "" ? "" : `last_name=${lastName}`);
-    const role_id = (roleID == "" ? "" : `role_id=${roleID}`);
-    const manager_id = (managerID== "" ? "" : `manager_id=${managerID}`)
+function editEmployee(id, firstName, lastName, roleID, managerID){
     return db.query(
-        `UPDATE department SET ${first_name}, ${last_name}, ${role_id}, ${manager_id} WHERE id=?`,
-        [id]
+        "UPDATE employee SET " + 
+        (firstName ? `first_name='${firstName}', ` : "") +
+        (lastName ? `last_name='${lastName}', ` : "") +
+        (roleID ? `role_id=${roleID}, ` : "") +
+        (managerID ? `manager_id=${managerID} ` : "") +
+        `WHERE id=${id}`
     );
 }
 
@@ -97,18 +99,18 @@ function getAllDepartments(){
 }
 
 function getAllRoles(id){
-    return db.query("SELECT * FROM `role` WHERE `role`.department_id=?", [id]);
+    return db.query("SELECT * FROM `role` AS r " + (id ? `WHERE r.department_id=${id}` : ""));
 }
 
-function getEmployee(id){ 
+function getEmployee(id, order){ 
     // default: return all employees
-    // if an id is provided: return specific employee
+    // if an id is provided: return specific employee; if an order is provided: return ordered list;
     return db.query(
-        "SELECT e.id, e.first_name, e.last_name, r.title, d.`name` AS department, r.salary, CONCAT(m.first_name, ' ', m.last_name) AS manager " + 
+        "SELECT e.id, e.first_name, e.last_name, r.title, d.`name` AS department, r.salary, CONCAT(m.first_name, ' ', m.last_name) AS reporting_to " + 
         "FROM (employee AS e, `role` AS r, department AS d) " +
         "LEFT JOIN employee AS m ON e.manager_id=m.id " +
         "WHERE e.role_id=r.id AND r.department_id=d.id " +
-        (id ? `AND e.id=${id}` : ""));
+        (id != null ? `AND e.id=${id}` : "") + (order ? `ORDER BY ${order}` : ""));
 }
 
 function getManager(id){
@@ -116,7 +118,7 @@ function getManager(id){
         "SELECT CONCAT(e.first_name, ' ', e.last_name) AS manager " + 
         "FROM employee AS e " +
         "LEFT JOIN `role` AS r ON e.role_id=r.id "+
-        "WHERE r.title LIKE '%Manager%' AND r.department_id=?", [id]);
+        "WHERE r.title LIKE '%Manager%' " + (id ? `AND r.department_id=${id}` : ""));
 }
 
 module.exports = { addDepartment, addEmployee, addRole, editDepartment, editEmployee, editRole, deleteDepartment, 
