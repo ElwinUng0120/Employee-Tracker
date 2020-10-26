@@ -54,7 +54,7 @@ function addEmployee(firstName, lastName, rold_id, manager_id){
 
 function editDepartment(name, id){
     return db.query(
-        "UPDATE department SET `name`='?' WHERE id=?",
+        "UPDATE department SET `name`=? WHERE id=?",
         [name, id]
     );
 }
@@ -62,8 +62,8 @@ function editDepartment(name, id){
 function editRole(title, salary, id){
     if(title === "" && isNaN(salary)) return console.log("No changes were made"); // error catching if both title and salary were left blank
     return db.query(
-        "UPDATE role SET " +
-        (title ? `title="${title}" ` : "") + (salary ? `salary=${salary} ` : "") +
+        "UPDATE `role` SET " +
+        (title ? `title="${title}", ` : "") + (salary ? `salary=${salary} ` : "") +
         `WHERE id=${id}`
     );
 }
